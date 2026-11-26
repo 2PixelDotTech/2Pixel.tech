@@ -1,0 +1,39 @@
+// Cloudflare Worker configuration for 2pixels.tech.
+// Setup steps: docs/CLOUDFLARE-SETUP.md
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "two-pixel",
+  "main": "worker/index.js",
+  "compatibility_date": "2025-11-01",
+
+  // Static site produced by `php build.php`. Requests for files are served straight from here;
+  // anything else (e.g. POST /api/contact) runs the Worker.
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+
+  // Non-secret settings. Secrets (TURNSTILE_SECRET_KEY, RESEND_API_KEY) are added with
+  // `npx wrangler secret put NAME` and never stored in this file.
+  "vars": {
+    "MAIL_TO": "info@2pixels.tech",
+    "MAIL_FROM": "website@2pixels.tech",
+    "CONTACT_EMAIL": "info@2pixels.tech"
+  },
+
+  // Optional backup store for enquiries. Create it with
+  //   npx wrangler kv namespace create ENQUIRIES
+  // then uncomment this block and paste the id it prints.
+  // "kv_namespaces": [
+  //   { "binding": "ENQUIRIES", "id": "PASTE_THE_ID_HERE" }
+  // ],
+
+  // Your domain. Uncomment after 2pixels.tech is active in your Cloudflare account.
+  // "routes": [
+  //   { "pattern": "2pixels.tech", "custom_domain": true }
+  // ],
+
+  "observability": { "enabled": true }
+}

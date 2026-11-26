@@ -1,0 +1,13 @@
+{
+  "name": "two-pixel-website",
+  "private": true,
+  "description": "Two Pixel website (2pixels.tech): static pages built with PHP, served by Cloudflare Workers.",
+  "scripts": {
+    "build": "php build.php",
+    "dev": "php build.php && wrangler dev",
+    "deploy": "php build.php --production && wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.167.0"
+  }
+}
