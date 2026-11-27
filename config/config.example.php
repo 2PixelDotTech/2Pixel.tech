@@ -16,12 +16,12 @@ return [
 
     // Cloudflare Turnstile SITE key (public). This default is Cloudflare's test key, which only
     // works for local testing; `npm run deploy` refuses to deploy with it.
-    'TURNSTILE_SITE_KEY' => '1x00000000000000000000AA',
+    'TURNSTILE_SITE_KEY' => '0x4AAAAAAGUyg9lUAw-5Syz6',
 
     // Shown in the Privacy Policy (POPIA section 18 requires the responsible party's name and address).
     // The Information Officer must also be registered with the Information Regulator.
     'INFORMATION_OFFICER' => 'Wanga Nembahe',
-    'BUSINESS_ADDRESS'    => '',
+    'BUSINESS_ADDRESS' => 'info@2Pixels.tech',
 
     // Set to false for staging/test builds so search engines never index them.
     'ALLOW_INDEXING' => true,
