@@ -51,9 +51,15 @@ define('SITE_URL', rtrim((string) config('SITE_URL', 'https://2pixels.tech'), '/
 define('CONTACT_EMAIL', (string) config('CONTACT_EMAIL', 'info@2pixels.tech'));
 // Set ALLOW_INDEXING to false on staging copies so search engines don't index them.
 define('ALLOW_INDEXING', filter_var(config('ALLOW_INDEXING', true), FILTER_VALIDATE_BOOLEAN));
-// Public Cloudflare Turnstile site key (safe to publish; the SECRET key lives only in the Worker).
-// The default is Cloudflare's official test key, which always passes. Replace it before going live.
-define('TURNSTILE_SITE_KEY', (string) config('TURNSTILE_SITE_KEY', '1x00000000000000000000AA'));
+// Cloudflare Turnstile site key (public; the SECRET key lives only in the Worker).
+// Local builds (npm run dev / npm run build) always use Cloudflare's official test key, which pairs
+// with the test secret in .dev.vars and works on localhost. Only `npm run deploy` (build.php --production)
+// uses your real key from config/config.php, which only works on 2pixels.tech.
+define('TURNSTILE_TEST_SITE_KEY', '1x00000000000000000000AA');
+define('PRODUCTION_BUILD', PHP_SAPI === 'cli' && in_array('--production', $_SERVER['argv'] ?? [], true));
+define('TURNSTILE_SITE_KEY', PRODUCTION_BUILD
+    ? (string) config('TURNSTILE_SITE_KEY', TURNSTILE_TEST_SITE_KEY)
+    : TURNSTILE_TEST_SITE_KEY);
 
 /* -------------------------------------------------------------------------
  * Helpers

@@ -56,7 +56,11 @@ npm run dev
 
 Open http://localhost:8787. This builds the site and runs it exactly as Cloudflare will, contact form included.
 
-Locally, Turnstile uses Cloudflare's **test keys**, which always pass and show a "testing only" banner. Unless you add a Resend key to `.dev.vars`, the form reports that it couldn't deliver the message. That's expected: nothing is configured to receive it.
+Locally:
+- **No Cloudflare login and no workers.dev subdomain are needed.**
+- **Turnstile** uses Cloudflare's **test keys**, which always pass and show a "testing only" banner. Local builds pick the test site key automatically; `npm run deploy` uses your real one.
+- **Enquiries** are saved to a local test copy of the `ENQUIRIES` store in `.wrangler/`, never your live one. List them with `npx wrangler kv key list --binding ENQUIRIES --local`.
+- **No email is sent** unless you put a Resend key in `.dev.vars`.
 
 ## Settings
 
@@ -64,12 +68,12 @@ Locally, Turnstile uses Cloudflare's **test keys**, which always pass and show a
 |---|---|---|
 | `config/config.php` | `SITE_URL` | `https://2pixels.tech`. Used for canonical URLs, Open Graph, robots.txt and the sitemap |
 | | `CONTACT_EMAIL` | Address shown on the site (`info@2pixels.tech`) |
-| | `TURNSTILE_SITE_KEY` | Public Turnstile key. `npm run deploy` refuses to deploy with the test key |
+| | `TURNSTILE_SITE_KEY` | Your real public Turnstile key (`0x…`). Used only by `npm run deploy`, which refuses to run without it |
 | | `INFORMATION_OFFICER`, `BUSINESS_ADDRESS` | Shown in the Privacy Policy (required by POPIA) |
 | | `ALLOW_INDEXING` | `false` for staging builds (adds noindex; robots.txt blocks all) |
 | `wrangler.jsonc` → `vars` | `MAIL_TO`, `MAIL_FROM`, `CONTACT_EMAIL` | Where enquiries are emailed and who they come from |
 | Cloudflare secrets | `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY` | Set with `npx wrangler secret put NAME`. Never stored in files |
-| `wrangler.jsonc` → `kv_namespaces` | `ENQUIRIES` | Backup store; enquiries are kept for 12 months |
+| `wrangler.jsonc` → `kv_namespaces` | `ENQUIRIES` | Enquiry store; enquiries are kept for 12 months. Local in dev, live when deployed |
 
 Settings in `config/config.php` can also be supplied as environment variables when building.
 

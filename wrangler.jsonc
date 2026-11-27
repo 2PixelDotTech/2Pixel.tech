@@ -5,6 +5,7 @@
 	"name": "two-pixel",
 	"main": "worker/index.js",
 	"compatibility_date": "2025-11-01",
+
 	// Static site produced by `php build.php`. Requests for files are served straight from here;
 	// anything else (e.g. POST /api/contact) runs the Worker.
 	"assets": {
@@ -13,6 +14,7 @@
 		"html_handling": "auto-trailing-slash",
 		"not_found_handling": "404-page"
 	},
+
 	// Non-secret settings. Secrets (TURNSTILE_SECRET_KEY, RESEND_API_KEY) are added with
 	// `npx wrangler secret put NAME` and never stored in this file.
 	"vars": {
@@ -20,25 +22,26 @@
 		"MAIL_FROM": "website@2pixels.tech",
 		"CONTACT_EMAIL": "info@2pixels.tech"
 	},
-	// Optional backup store for enquiries. Create it with
-	//   npx wrangler kv namespace create ENQUIRIES
-	// then uncomment this block and paste the id it prints.
-	// "kv_namespaces": [
-	//   { "binding": "ENQUIRIES", "id": "PASTE_THE_ID_HERE" }
-	// ],
-	// Your domain (2pixels.tech must be active in your Cloudflare account).
+
+	// Backup store for enquiries (kept 12 months).
+	// `npm run dev` uses a LOCAL copy stored in .wrangler/, so testing never touches real enquiries
+	// and needs no Cloudflare login. Don't add "remote": true here: it makes local dev connect to the
+	// live namespace, which needs a workers.dev subdomain and would mix test data with real enquiries.
+	"kv_namespaces": [
+		{ "binding": "ENQUIRIES", "id": "8abc9c04a6124667ac5cd050f93b0eb3" }
+	],
+
+	// The site is served only on your own domain (2pixels.tech must be active in your Cloudflare account).
 	"routes": [
 		{ "pattern": "2pixels.tech", "custom_domain": true },
 		{ "pattern": "www.2pixels.tech", "custom_domain": true }
 	],
+	// No extra *.workers.dev copy of the site or preview URLs: avoids duplicate content in search
+	// results and means no workers.dev subdomain is needed.
+	"workers_dev": false,
+	"preview_urls": false,
+
 	"observability": {
 		"enabled": true
-	},
-	"kv_namespaces": [
-		{
-			"binding": "ENQUIRIES",
-			"id": "8abc9c04a6124667ac5cd050f93b0eb3",
-			"remote": true
-		}
-	]
+	}
 }

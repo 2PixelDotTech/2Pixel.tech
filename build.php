@@ -2,7 +2,8 @@
 /**
  * Static site build for Cloudflare.
  *
- *   php build.php          (or: npm run build)
+ *   php build.php                 local build, Turnstile test key   (npm run build / npm run dev)
+ *   php build.php --production    live build, real Turnstile key     (npm run deploy)
  *
  * Renders every PHP page into plain HTML in dist/, writes robots.txt and sitemap.xml,
  * and copies assets plus the Cloudflare _headers file. Cloudflare serves dist/ as-is;
@@ -19,10 +20,14 @@ if (PHP_SAPI !== 'cli') {
 require __DIR__ . '/includes/bootstrap.php';
 
 $dist = ROOT_DIR . '/dist';
-$production = in_array('--production', $argv, true);
+$production = PRODUCTION_BUILD;
 
-if ($production && TURNSTILE_SITE_KEY === '1x00000000000000000000AA') {
-    fwrite(STDERR, "Stopped: TURNSTILE_SITE_KEY is still Cloudflare's test key. Add your real site key to config/config.php.\n");
+if ($production && TURNSTILE_SITE_KEY === TURNSTILE_TEST_SITE_KEY) {
+    fwrite(STDERR, "Stopped: no real TURNSTILE_SITE_KEY in config/config.php (it is missing or still the test key).\n");
+    exit(1);
+}
+if ($production && !preg_match('/^0x[0-9A-Za-z_-]{10,}$/', TURNSTILE_SITE_KEY)) {
+    fwrite(STDERR, "Stopped: TURNSTILE_SITE_KEY in config/config.php doesn't look like a Turnstile site key (they start with 0x).\n");
     exit(1);
 }
 if ($production && !ALLOW_INDEXING) {
@@ -135,6 +140,9 @@ echo "  file     _headers\n";
 
 echo "\nBuilt " . count($pages) . " pages into dist/ for " . SITE_URL
     . (ALLOW_INDEXING ? '' : ' (noindex staging build)') . "\n";
-if (TURNSTILE_SITE_KEY === '1x00000000000000000000AA') {
-    echo "Note: using Cloudflare's Turnstile TEST site key (fine locally). Set TURNSTILE_SITE_KEY before deploying.\n";
+if (!$production) {
+    echo "Local build: using Cloudflare's Turnstile TEST key. `npm run deploy` uses your real key from config/config.php.\n";
+}
+if ($production && trim((string) config('BUSINESS_ADDRESS', '')) === '') {
+    echo "Warning: BUSINESS_ADDRESS is empty, so the Privacy Policy says the address is available on request. POPIA expects a physical or postal address.\n";
 }

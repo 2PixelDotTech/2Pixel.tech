@@ -74,8 +74,8 @@ cp config/config.example.php config/config.php
 
 Open `config/config.php` and set:
 
-- `TURNSTILE_SITE_KEY`: the **site key** from Part 3.
-- `BUSINESS_ADDRESS`: required by POPIA for the Privacy Policy.
+- `TURNSTILE_SITE_KEY`: the **site key** from Part 3 (starts with `0x`). Only `npm run deploy` uses it. Local builds use Cloudflare's test key automatically, because your real key only works on 2pixels.tech.
+- `BUSINESS_ADDRESS`: a **physical or postal address**, not an email. POPIA requires it for the Privacy Policy.
 - `INFORMATION_OFFICER`: confirm the name.
 
 `config/config.php` is never committed to git.
@@ -96,13 +96,15 @@ Open `config/config.php` and set:
    npx wrangler kv namespace create ENQUIRIES
    ```
 
-   It prints an `id`. Open `wrangler.jsonc`, uncomment the `kv_namespaces` block, and paste the id in place of `PASTE_THE_ID_HERE`.
+   It prints an `id` and offers to add it to `wrangler.jsonc` for you; you can say **yes**. If it asks *"For local dev, do you want to connect to the remote resource?"*, answer **no**. Otherwise `npm run dev` tries to connect to the live store, which fails without a workers.dev subdomain and would mix test messages with real enquiries. If you already answered yes, delete `"remote": true` from the `kv_namespaces` entry.
+
+   **Done for this project:** `wrangler.jsonc` already has the `ENQUIRIES` binding (id `8abc9c04…`) in local mode.
 
 Until Resend is set up (Part 9), this backup is where enquiries arrive, so **don't skip it**. Without Resend *or* KV, the form tells visitors to email you instead.
 
 ## Part 7: Connect the domain and go live
 
-1. In `wrangler.jsonc`, uncomment the `routes` block so it reads:
+1. **Already done for this project.** `wrangler.jsonc` has the `routes` block below, plus `"workers_dev": false`, so the site is served only on your domain:
 
    ```jsonc
    "routes": [
@@ -110,8 +112,6 @@ Until Resend is set up (Part 9), this backup is where enquiries arrive, so **don
      { "pattern": "www.2pixels.tech", "custom_domain": true }
    ],
    ```
-
-   You'll need to add the second line, for `www`.
 
 2. Deploy:
 
@@ -165,13 +165,12 @@ Enquiries are emailed **to** `MAIL_TO` (info@2pixels.tech) **from** `MAIL_FROM` 
 
 ## Optional extras
 
-- **Stop the `*.workers.dev` copy of the site:** once the domain works, add `"workers_dev": false` to `wrangler.jsonc` and deploy again.
 - **Extra spam protection:** if spam ever gets past Turnstile, go to **Security → WAF → Rate limiting rules** and add a free rule for URI path `/api/contact`, limiting each IP to a few requests.
 - **Errors:** **Workers & Pages → two-pixel → Logs** shows any errors from the contact form, such as a rejected Resend key.
 
 ## Updating the site later
 
-Edit the PHP templates, CSS or JS. Preview locally with:
+Edit the PHP templates, CSS or JS. Preview locally with the command below. It needs no Cloudflare login. The form uses Turnstile's test keys, and enquiries are saved to a local test store in `.wrangler/`, not your real one.
 
 ```bash
 npm run dev

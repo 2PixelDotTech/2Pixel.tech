@@ -14,14 +14,14 @@ return [
     // Public email shown on the site.
     'CONTACT_EMAIL' => 'info@2pixels.tech',
 
-    // Cloudflare Turnstile SITE key (public). This default is Cloudflare's test key, which only
-    // works for local testing; `npm run deploy` refuses to deploy with it.
-    'TURNSTILE_SITE_KEY' => '0x4AAAAAAGUyg9lUAw-5Syz6',
+    // Your real Cloudflare Turnstile SITE key (public, starts with 0x). Used only by `npm run deploy`;
+    // local builds automatically use Cloudflare's test key so the form works on localhost.
+    'TURNSTILE_SITE_KEY' => 'PASTE_YOUR_SITE_KEY_HERE',
 
     // Shown in the Privacy Policy (POPIA section 18 requires the responsible party's name and address).
     // The Information Officer must also be registered with the Information Regulator.
     'INFORMATION_OFFICER' => 'Wanga Nembahe',
-    'BUSINESS_ADDRESS' => 'info@2Pixels.tech',
+    'BUSINESS_ADDRESS'    => '', // a physical or postal address, not an email
 
     // Set to false for staging/test builds so search engines never index them.
     'ALLOW_INDEXING' => true,
